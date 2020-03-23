@@ -10,6 +10,7 @@ import time
 import os
 import sys
 import subprocess
+import shlex
 
 class GCodeSystemCommands(octoprint.plugin.StartupPlugin,
                             octoprint.plugin.TemplatePlugin,
@@ -30,7 +31,7 @@ class GCodeSystemCommands(octoprint.plugin.StartupPlugin,
         self._logger.debug("command_definitions: %s" % command_definitions_tmp)
 
         for definition in command_definitions_tmp:
-            cmd_id = definition['id']
+            cmd_id = str(definition['id'])
             cmd_line = definition['command']
             self.command_definitions[cmd_id] = cmd_line
             self._logger.info("Add command definition OCTO%s = %s" % (cmd_id, cmd_line))
@@ -38,7 +39,7 @@ class GCodeSystemCommands(octoprint.plugin.StartupPlugin,
     def hook_gcode_queuing(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
         if not gcode and cmd[:4].upper() == 'OCTO':
             cmd_pieces = cmd[4:].split(' ', 1)
-            cmd_id = cmd_pieces[0]
+            cmd_id = str(cmd_pieces[0])
             cmd_args = ""
             if len(cmd_pieces) > 1:
                 cmd_args = cmd_pieces[1]
